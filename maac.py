@@ -87,7 +87,8 @@ def run(config):
     # for check
     file_num = 1
     case_size = 1000
-    count_start = 60000
+    count_start = 1
+    result = []
     for ep_i in range(config.n_episodes):
         print("Episodes %i-%i of %i" % (ep_i + 1,
                                     ep_i + 1 + config.n_rollout_threads,
@@ -95,7 +96,14 @@ def run(config):
         # for test
         # np.random.seed(seed)
         # seed += 1
-        
+
+        result_list = []
+        if ep_i !=0:
+            result_ep = [ep_i-1,result]
+            result_list.append(result_ep);
+            result = []
+            with open('check_data_file/episode_result{}.txt'.format(1),'a') as file:
+                file.write('episode {} : \n{}\n'.format(ep_i-1, result_ep))
         e.create_map()
         model.prep_rollouts(device='cpu')
         step_list = np.zeros(agent_num)
@@ -117,11 +125,12 @@ def run(config):
                 # 未到达目的地
                 if robot.is_end is False:
                     ready, current_state = e.present_state(robot)
-                    robot.state = e.get_obs(robot)
+                robot.state = e.get_obs(robot)
                 dones.append(robot.is_end)
                 
             dones = tuple([dones])
             dones = np.stack(dones)
+            result = np.stack(dones)
             success = np.logical_or(success, dones)
             steps += dones
             next_obs = tuple([[robot.state for robot in e.robot_list]])
@@ -165,16 +174,16 @@ def run(config):
                 total_reward_list[robot.id] += robot.reward
                 # for check
                 is_print = True
-                # 刚刚到达目的地
-                if robot.is_end:
-                    reach_now[robot.id] = True
-            # for check
+            #     # 刚刚到达目的地
+            #     if robot.is_end:
+            #         reach_now[robot.id] = True
+            # # for check
             if ep_i > count_start:
                 s = e.write_map2file(s, is_print)
-            # 更新刚到达目的地的agent的obs
-            for robot_id, robot in enumerate(e.robot_list):
-                if reach_now[robot_id]:
-                    robot.state = e.get_obs(robot)
+            # # 更新刚到达目的地的agent的obs
+            # for robot_id, robot in enumerate(e.robot_list):
+            #     if reach_now[robot_id]:
+            #         robot.state = e.get_obs(robot)robot
                 
             rewards = tuple([[robot.reward for robot in e.robot_list]])
             e.rewards = np.stack(rewards)
@@ -295,9 +304,9 @@ if __name__ == '__main__':
     parser.add_argument("--n_episodes", default=100000, type=int)
     parser.add_argument("--episode_length", default=50, type=int)
     parser.add_argument("--steps_per_update", default=100, type=int)
-    parser.add_argument("--num_critic_updates", default=4, type=int,
+    parser.add_argument("--num_critic_updates", default=6, type=int,
                         help="Number of critic updates per update cycle")
-    parser.add_argument("--num_pol_updates", default=4, type=int,
+    parser.add_argument("--num_pol_updates", default=6, type=int,
                         help="Number of policy updates per update cycle")
     parser.add_argument("--pi_batch_size",
                         default=1024, type=int,
