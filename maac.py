@@ -87,7 +87,7 @@ def run(config):
     # for check
     file_num = 1
     case_size = 1000
-    count_start = 1
+    count_start = 60000
     result = []
     for ep_i in range(config.n_episodes):
         print("Episodes %i-%i of %i" % (ep_i + 1,
@@ -106,8 +106,10 @@ def run(config):
                 else:
                     true_number = true_number+1
             result_ep = [ep_i-1,false_number,true_number]
+            for step_i in range(len(step_list)):
+                result_ep.append(step_list[step_i])
             result = []
-            with open('check_data_file/episode_result_6_6_4.csv','a')as f:
+            with open('check_data_file/episode_result_6_6_4.csv','a',newline='')as f:
                 f_csv = csv.writer(f)
                 f_csv.writerow(result_ep)
             f.close()
@@ -311,12 +313,12 @@ if __name__ == '__main__':
                              "model/training contents")
     parser.add_argument("--n_rollout_threads", default=1, type=int)
     parser.add_argument("--buffer_length", default=int(1e6), type=int)
-    parser.add_argument("--n_episodes", default=100000, type=int)
+    parser.add_argument("--n_episodes", default=150000, type=int)
     parser.add_argument("--episode_length", default=50, type=int)
     parser.add_argument("--steps_per_update", default=100, type=int)
-    parser.add_argument("--num_critic_updates", default=6, type=int,
+    parser.add_argument("--num_critic_updates", default=4, type=int,
                         help="Number of critic updates per update cycle")
-    parser.add_argument("--num_pol_updates", default=6, type=int,
+    parser.add_argument("--num_pol_updates", default=4, type=int,
                         help="Number of policy updates per update cycle")
     parser.add_argument("--pi_batch_size",
                         default=1024, type=int,
