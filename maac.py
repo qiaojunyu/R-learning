@@ -1,6 +1,6 @@
 from __future__ import print_function
 import numpy as np
-import time
+import csv
 import argparse
 import torch
 import os
@@ -96,14 +96,24 @@ def run(config):
         # for test
         # np.random.seed(seed)
         # seed += 1
-
-        result_list = []
+        headers = ['episode','false_number','true_number']
+        false_number = 0
+        true_number = 0
         if ep_i !=0:
-            result_ep = [ep_i-1,result]
-            result_list.append(result_ep);
+            for  set_i in range(len(result)):
+                if result[set_i] == False:
+                    false_number = false_number+1
+                else:
+                    true_number = true_number+1
+            result_ep = [ep_i-1,false_number,true_number]
             result = []
+            with open('check_data_file/episode_result_6_6_4.csv','a')as f:
+                f_csv = csv.writer(f)
+                f_csv.writerow(result_ep)
+            f.close()
             with open('check_data_file/episode_result{}.txt'.format(1),'a') as file:
                 file.write('episode {} : \n{}\n'.format(ep_i-1, result_ep))
+            file.close()
         e.create_map()
         model.prep_rollouts(device='cpu')
         step_list = np.zeros(agent_num)
@@ -130,7 +140,7 @@ def run(config):
                 
             dones = tuple([dones])
             dones = np.stack(dones)
-            result = np.stack(dones)
+            result = np.stack(dones)[0]
             success = np.logical_or(success, dones)
             steps += dones
             next_obs = tuple([[robot.state for robot in e.robot_list]])
