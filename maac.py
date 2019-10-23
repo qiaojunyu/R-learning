@@ -142,7 +142,6 @@ def run(config):
                 
             dones = tuple([dones])
             dones = np.stack(dones)
-            result = np.stack(dones)[0]
             success = np.logical_or(success, dones)
             steps += dones
             next_obs = tuple([[robot.state for robot in e.robot_list]])
@@ -206,6 +205,7 @@ def run(config):
                     # c += 1
                     dones = tuple([[robot.is_end for robot in e.robot_list]])
                     dones = np.stack(dones)
+                    result = np.stack(dones)[0]
                     success = np.logical_or(success, dones)
                     steps += dones
                     next_obs = tuple([[robot.state for robot in e.robot_list]])
