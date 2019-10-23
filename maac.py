@@ -316,9 +316,9 @@ if __name__ == '__main__':
     parser.add_argument("--n_episodes", default=150000, type=int)
     parser.add_argument("--episode_length", default=50, type=int)
     parser.add_argument("--steps_per_update", default=100, type=int)
-    parser.add_argument("--num_critic_updates", default=4, type=int,
+    parser.add_argument("--num_critic_updates", default=6, type=int,
                         help="Number of critic updates per update cycle")
-    parser.add_argument("--num_pol_updates", default=4, type=int,
+    parser.add_argument("--num_pol_updates", default=6, type=int,
                         help="Number of policy updates per update cycle")
     parser.add_argument("--pi_batch_size",
                         default=1024, type=int,
