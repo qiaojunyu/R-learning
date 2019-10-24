@@ -36,7 +36,40 @@ def data_reprocess(replay_buffer_data, length):
     return all_result
 
 def run(config):
-    
+
+    # data_ave = []
+    # data_success = 0
+    # data_false = 0
+    # data_average = 0
+    # with open('check_data_file/episode_result_4_4_4.csv')as c:
+    #
+    #     r = list(csv.reader(c))
+    #     index_size = len(r)
+    #     for i in r:
+    #         if float(i[0])>0:
+    #             data_ave.append(float(i[2]))
+    #             if float(i[2]) == 6:
+    #                 data_success = data_success+1
+    #             else:
+    #                 data_false = data_false +1
+    #             if float(i[0])%1000 == 0:
+    #                 data_average = np.mean(data_ave)
+    #                 a_res = [data_average,data_success,data_false]
+    #                 with open('check_data_file/analyse.csv','a',newline='')as file_a:
+    #                     file_a_csv = csv.writer(file_a)
+    #                     file_a_csv.writerow(a_res)
+    #                 date_ave = []
+    #                 data_success = 0
+    #                 data_false = 0
+    #                 data_average = 0
+    #             if float(i[0]) == index_size-1:
+    #                 data_average = np.mean(date_ave)
+    #                 a_res = [data_average,data_success,data_false]
+    #                 with open('check_data_file/analyse.csv','a',newline='')as file_a:
+    #                     file_a_csv = csv.writer(file_a)
+    #                     file_a_csv.writerow(a_res)
+    # c.close()
+
     model_dir = Path('./models') / config.env_id / config.model_name
     if not model_dir.exists():
         run_num = 1
@@ -96,7 +129,6 @@ def run(config):
         # for test
         # np.random.seed(seed)
         # seed += 1
-        headers = ['episode','false_number','true_number']
         false_number = 0
         true_number = 0
         if ep_i !=0:
@@ -109,7 +141,7 @@ def run(config):
             for step_i in range(len(step_list)):
                 result_ep.append(step_list[step_i])
             result = []
-            with open('check_data_file/episode_result_6_6_4.csv','a',newline='')as f:
+            with open('check_data_file/episode_result_6_6_6.csv','a',newline='')as f:
                 f_csv = csv.writer(f)
                 f_csv.writerow(result_ep)
             f.close()
@@ -205,7 +237,6 @@ def run(config):
                     # c += 1
                     dones = tuple([[robot.is_end for robot in e.robot_list]])
                     dones = np.stack(dones)
-                    result = np.stack(dones)[0]
                     success = np.logical_or(success, dones)
                     steps += dones
                     next_obs = tuple([[robot.state for robot in e.robot_list]])
@@ -231,7 +262,8 @@ def run(config):
                 model.update_all_targets()
                 model.prep_rollouts(device='cpu')
         # exit(0)
-        
+        dones = tuple([[robot.is_end for robot in e.robot_list]])
+        result = np.stack(dones)[0]
         if not e.is_end:
             if all(operator.eq(e.rewards[0], rewards_all_zeros[0])):
                 print('all zeros')
@@ -297,6 +329,7 @@ def run(config):
     # np.save('check_data_file\{}_geek'.format('rew_buffs'), rew_buffs)
 
 
+
     model.save(run_dir / 'model.pt')
     # e.close()
     logger.export_scalars_to_json(str(log_dir / 'summary.json'))
@@ -328,8 +361,8 @@ if __name__ == '__main__':
                         help="Batch size for critic training")
     parser.add_argument("--save_interval", default=1000, type=int)
     parser.add_argument("--pol_hidden_dim", default=128, type=int)
-    parser.add_argument("--critic_hidden_dim", default=128, type=int)
-    parser.add_argument("--attend_heads", default=4, type=int)
+    parser.add_argument("--critic_hidden_dim", default=48, type=int)
+    parser.add_argument("--attend_heads", default=6, type=int)
     parser.add_argument("--pi_lr", default=0.001, type=float)
     parser.add_argument("--q_lr", default=0.001, type=float)
     parser.add_argument("--tau", default=0.04, type=float)
