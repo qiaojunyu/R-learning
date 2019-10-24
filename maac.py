@@ -37,38 +37,38 @@ def data_reprocess(replay_buffer_data, length):
 
 def run(config):
 
-    # data_ave = []
-    # data_success = 0
-    # data_false = 0
-    # data_average = 0
-    # with open('check_data_file/episode_result_4_4_4.csv')as c:
-    #
-    #     r = list(csv.reader(c))
-    #     index_size = len(r)
-    #     for i in r:
-    #         if float(i[0])>0:
-    #             data_ave.append(float(i[2]))
-    #             if float(i[2]) == 6:
-    #                 data_success = data_success+1
-    #             else:
-    #                 data_false = data_false +1
-    #             if float(i[0])%1000 == 0:
-    #                 data_average = np.mean(data_ave)
-    #                 a_res = [data_average,data_success,data_false]
-    #                 with open('check_data_file/analyse.csv','a',newline='')as file_a:
-    #                     file_a_csv = csv.writer(file_a)
-    #                     file_a_csv.writerow(a_res)
-    #                 date_ave = []
-    #                 data_success = 0
-    #                 data_false = 0
-    #                 data_average = 0
-    #             if float(i[0]) == index_size-1:
-    #                 data_average = np.mean(date_ave)
-    #                 a_res = [data_average,data_success,data_false]
-    #                 with open('check_data_file/analyse.csv','a',newline='')as file_a:
-    #                     file_a_csv = csv.writer(file_a)
-    #                     file_a_csv.writerow(a_res)
-    # c.close()
+  # config  data_ave = []
+  #   data_success = 0
+  #   data_false = 0
+  #   data_average = 0
+  #   with open('check_data_file/episode_result_6_6_4.csv')as c:
+  #
+  #       r = list(csv.reader(c))
+  #       index_size = len(r)
+  #       for i in r:
+  #           if float(i[0])>0:
+  #               data_ave.append(float(i[2]))
+  #               if float(i[2]) == 6:
+  #                   data_success = data_success+1
+  #               else:
+  #                   data_false = data_false +1
+  #               if float(i[0])%1000 == 0:
+  #                   data_average = np.mean(data_ave)
+  #                   a_res = [data_average,data_success,data_false]
+  #                   with open('check_data_file/analyse.csv','a',newline='')as file_a:
+  #                       file_a_csv = csv.writer(file_a)
+  #                       file_a_csv.writerow(a_res)
+  #                   date_ave = []
+  #                   data_success = 0
+  #                   data_false = 0
+  #                   data_average = 0
+  #               if float(i[0]) == index_size-1:
+  #                   data_average = np.mean(date_ave)
+  #                   a_res = [data_average,data_success,data_false]
+  #                   with open('check_data_file/analyse.csv','a',newline='')as file_a:
+  #                       file_a_csv = csv.writer(file_a)
+  #                       file_a_csv.writerow(a_res)
+  #   c.close()
 
     model_dir = Path('./models') / config.env_id / config.model_name
     if not model_dir.exists():
@@ -141,7 +141,7 @@ def run(config):
             for step_i in range(len(step_list)):
                 result_ep.append(step_list[step_i])
             result = []
-            with open('check_data_file/episode_result_6_6_6.csv','a',newline='')as f:
+            with open('check_data_file/episode_result_6_6_4_32.csv','a',newline='')as f:
                 f_csv = csv.writer(f)
                 f_csv.writerow(result_ep)
             f.close()
@@ -361,8 +361,8 @@ if __name__ == '__main__':
                         help="Batch size for critic training")
     parser.add_argument("--save_interval", default=1000, type=int)
     parser.add_argument("--pol_hidden_dim", default=128, type=int)
-    parser.add_argument("--critic_hidden_dim", default=48, type=int)
-    parser.add_argument("--attend_heads", default=6, type=int)
+    parser.add_argument("--critic_hidden_dim", default=32, type=int)
+    parser.add_argument("--attend_heads", default=4, type=int)
     parser.add_argument("--pi_lr", default=0.001, type=float)
     parser.add_argument("--q_lr", default=0.001, type=float)
     parser.add_argument("--tau", default=0.04, type=float)
