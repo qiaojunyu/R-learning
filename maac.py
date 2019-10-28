@@ -37,43 +37,43 @@ def data_reprocess(replay_buffer_data, length):
 
 def run(config):
 
-    data_ave = []
-    data_success = 0
-    data_false = 0
-    data_average = 0
-    step_ave = 0
-    with open('check_data_file/episode_result_6_6_6_48.csv')as c:
-
-        r = list(csv.reader(c))
-        index_size = len(r)
-        for i in r:
-            if float(i[0])>0:
-                data_ave.append(float(i[1]))
-                step_ave = step_ave+(float(i[3])+float(i[4])+float(i[5])+float(i[6])+float(i[7])+float(i[8]))
-                if float(i[2]) == 6:
-                    data_success = data_success+1
-                else:
-                    data_false = data_false +1
-                if float(i[0])%1000 == 0:
-                    data_average = np.mean(data_ave)
-                    step_ave = step_ave/(data_success+data_false)
-                    a_res = [data_average,data_success,data_false,step_ave]
-                    with open('check_data_file/analyse.csv','a',newline='')as file_a:
-                        file_a_csv = csv.writer(file_a)
-                        file_a_csv.writerow(a_res)
-                    date_ave = []
-                    data_success = 0
-                    data_false = 0
-                    data_average = 0
-                    step_ave = 0
-                if float(i[0]) == index_size-1:
-                    data_average = np.mean(data_ave)
-                    step_ave = step_ave/(data_success+data_false)
-                    a_res = [data_average,data_success,data_false,step_ave]
-                    with open('check_data_file/analyse.csv','a',newline='')as file_a:
-                        file_a_csv = csv.writer(file_a)
-                        file_a_csv.writerow(a_res)
-    c.close()
+    # data_ave = []
+    # data_success = 0
+    # data_false = 0
+    # data_average = 0
+    # step_ave = 0
+    # with open('check_data_file/episode_result_6_6_6_48.csv')as c:
+    #
+    #     r = list(csv.reader(c))
+    #     index_size = len(r)
+    #     for i in r:
+    #         if float(i[0])>0:
+    #             data_ave.append(float(i[1]))
+    #             step_ave = step_ave+(float(i[3])+float(i[4])+float(i[5])+float(i[6])+float(i[7])+float(i[8]))
+    #             if float(i[2]) == 6:
+    #                 data_success = data_success+1
+    #             else:
+    #                 data_false = data_false +1
+    #             if float(i[0])%1000 == 0:
+    #                 data_average = np.mean(data_ave)
+    #                 step_ave = step_ave/(data_success+data_false)
+    #                 a_res = [data_average,data_success,data_false,step_ave]
+    #                 with open('check_data_file/analyse.csv','a',newline='')as file_a:
+    #                     file_a_csv = csv.writer(file_a)
+    #                     file_a_csv.writerow(a_res)
+    #                 date_ave = []
+    #                 data_success = 0
+    #                 data_false = 0
+    #                 data_average = 0
+    #                 step_ave = 0
+    #             if float(i[0]) == index_size-1:
+    #                 data_average = np.mean(data_ave)
+    #                 step_ave = step_ave/(data_success+data_false)
+    #                 a_res = [data_average,data_success,data_false,step_ave]
+    #                 with open('check_data_file/analyse.csv','a',newline='')as file_a:
+    #                     file_a_csv = csv.writer(file_a)
+    #                     file_a_csv.writerow(a_res)
+    # c.close()
 
     model_dir = Path('./models') / config.env_id / config.model_name
     if not model_dir.exists():
