@@ -42,13 +42,13 @@ def run(config):
     # data_false = 0
     # data_average = 0
     # step_ave = 0
-    # with open('check_data_file/episode_result_6_6_6_48.csv')as c:
+    # with open('check_data_file/episode_result_6_6_6_96.csv')as c:
     #
     #     r = list(csv.reader(c))
     #     index_size = len(r)
     #     for i in r:
     #         if float(i[0])>0:
-    #             data_ave.append(float(i[1]))
+    #             data_ave.append(float(i[2]))
     #             step_ave = step_ave+(float(i[3])+float(i[4])+float(i[5])+float(i[6])+float(i[7])+float(i[8]))
     #             if float(i[2]) == 6:
     #                 data_success = data_success+1
@@ -353,7 +353,7 @@ if __name__ == '__main__':
                              "model/training contents")
     parser.add_argument("--n_rollout_threads", default=1, type=int)
     parser.add_argument("--buffer_length", default=int(1e6), type=int)
-    parser.add_argument("--n_episodes", default=150000, type=int)
+    parser.add_argument("--n_episodes", default=200000, type=int)
     parser.add_argument("--episode_length", default=50, type=int)
     parser.add_argument("--steps_per_update", default=100, type=int)
     parser.add_argument("--num_critic_updates", default=6, type=int,
