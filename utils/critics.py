@@ -32,31 +32,57 @@ class AttentionCritic(nn.Module):
 
         self.state_encoders = nn.ModuleList()
         
+        sa_size = sa_sizes[0]
+        sdim = sa_size[0]
+        adim = sa_size[1]
+        idim = sdim + adim
+        odim = adim
+        # share para
+        encoder = nn.Sequential()
+        if norm_in:
+            encoder.add_module('enc_bn', nn.BatchNorm1d(idim,
+                                                        affine=False))
+        encoder.add_module('enc_fc1', nn.Linear(idim, hidden_dim))
+        encoder.add_module('enc_nl', nn.LeakyReLU())
+
+        critic = nn.Sequential()
+        critic.add_module('critic_fc1', nn.Linear(2 * hidden_dim,
+                                                    hidden_dim))
+        critic.add_module('critic_nl', nn.LeakyReLU())
+        critic.add_module('critic_fc2', nn.Linear(hidden_dim, odim))
+
+        state_encoder = nn.Sequential()
+        if norm_in:
+            state_encoder.add_module('s_enc_bn', nn.BatchNorm1d(
+                                        sdim, affine=False))
+        state_encoder.add_module('s_enc_fc1', nn.Linear(sdim,
+                                                        hidden_dim))
+        state_encoder.add_module('s_enc_nl', nn.LeakyReLU())
+
         # iterate over agents
         for sdim, adim in sa_sizes:
-            idim = sdim + adim
-            odim = adim
-            encoder = nn.Sequential()
-            if norm_in:
-                encoder.add_module('enc_bn', nn.BatchNorm1d(idim,
-                                                            affine=False))
-            encoder.add_module('enc_fc1', nn.Linear(idim, hidden_dim))
-            encoder.add_module('enc_nl', nn.LeakyReLU())
+            # idim = sdim + adim
+            # odim = adim
+            # encoder = nn.Sequential()
+            # if norm_in:
+            #     encoder.add_module('enc_bn', nn.BatchNorm1d(idim,
+            #                                                 affine=False))
+            # encoder.add_module('enc_fc1', nn.Linear(idim, hidden_dim))
+            # encoder.add_module('enc_nl', nn.LeakyReLU())
             self.critic_encoders.append(encoder)
-            critic = nn.Sequential()
-            critic.add_module('critic_fc1', nn.Linear(2 * hidden_dim,
-                                                      hidden_dim))
-            critic.add_module('critic_nl', nn.LeakyReLU())
-            critic.add_module('critic_fc2', nn.Linear(hidden_dim, odim))
+            # critic = nn.Sequential()
+            # critic.add_module('critic_fc1', nn.Linear(2 * hidden_dim,
+            #                                           hidden_dim))
+            # critic.add_module('critic_nl', nn.LeakyReLU())
+            # critic.add_module('critic_fc2', nn.Linear(hidden_dim, odim))
             self.critics.append(critic)
-
-            state_encoder = nn.Sequential()
-            if norm_in:
-                state_encoder.add_module('s_enc_bn', nn.BatchNorm1d(
-                                            sdim, affine=False))
-            state_encoder.add_module('s_enc_fc1', nn.Linear(sdim,
-                                                            hidden_dim))
-            state_encoder.add_module('s_enc_nl', nn.LeakyReLU())
+            # state_encoder = nn.Sequential()
+            # if norm_in:
+            #     state_encoder.add_module('s_enc_bn', nn.BatchNorm1d(
+            #                                 sdim, affine=False))
+            # state_encoder.add_module('s_enc_fc1', nn.Linear(sdim,
+            #                                                 hidden_dim))
+            # state_encoder.add_module('s_enc_nl', nn.LeakyReLU())
             self.state_encoders.append(state_encoder)
 
         attend_dim = hidden_dim // attend_heads
