@@ -35,14 +35,10 @@ class AttentionSAC(object):
             hidden_dim (int): Number of hidden dimensions for networks
         """
         self.nagents = len(sa_size)
-        agent = AttentionAgent(lr=pi_lr,
-                               hidden_dim=pol_hidden_dim,
-                               **agent_init_params[0])
-        self.agents = [agent for _ in agent_init_params]
-        # self.agents = [AttentionAgent(lr=pi_lr,
-        #                               hidden_dim=pol_hidden_dim,
-        #                               **params)
-        #                  for params in agent_init_params]
+        self.agents = [AttentionAgent(lr=pi_lr,
+                                      hidden_dim=pol_hidden_dim,
+                                      **params)
+                         for params in agent_init_params]
         self.critic = AttentionCritic(sa_size, hidden_dim=critic_hidden_dim,
                                       attend_heads=attend_heads)
         self.target_critic = AttentionCritic(sa_size, hidden_dim=critic_hidden_dim,

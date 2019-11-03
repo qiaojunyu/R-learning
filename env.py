@@ -230,7 +230,7 @@ class Env(object):
         # self.seed(self.seed_int)
         # self.seed_int += 1
         
-        if (not agent.is_ready) and np.random.random() < 0.5:
+        if (not agent.is_ready) and np.random.random() < 1.0:
             agent.is_ready = True
             agent.current_position = agent.next_position
         state = [[-1 if c == '.' else 0 for c in line] for line in self.map]
