@@ -230,7 +230,7 @@ class Env(object):
         # self.seed(self.seed_int)
         # self.seed_int += 1
         
-        if (not agent.is_ready) and np.random.random() < 1.0:
+        if (not agent.is_ready) and np.random.random() < 0.7:
             agent.is_ready = True
             agent.current_position = agent.next_position
         state = [[-1 if c == '.' else 0 for c in line] for line in self.map]
@@ -443,13 +443,13 @@ class Env(object):
         # record observation for each agent
         for agent in self.robot_list:
             # cannot change the calling order of 
-            # functions get_reward and _get_obs
+            # functions get_reward and get_obs
             reward_n.append(self.get_reward(agent))
         
         for agent in self.robot_list:
-            obs_n.append(self._get_obs(agent))
-            done_n.append(self._get_done(agent))
-            info_n['is_ready'].append(self._get_info(agent))
+            obs_n.append(self.get_obs(agent))
+            done_n.append(self.get_done(agent))
+            info_n['is_ready'].append(self.get_info(agent))
         return obs_n, reward_n, done_n, info_n    
     
     def set_action(self, agent, action):
@@ -461,6 +461,10 @@ class Env(object):
         # print('agent {} action_u: {}'.format(agent.id, agent.action.u))
         agent.action.pre_u_onehot = agent.action.u_onehot
         agent.action.u_onehot = action
+        
+        if not agent.is_ready:
+            return 
+        
         # 默认为不动
         agent.action.action_choice = 4
         
@@ -500,42 +504,60 @@ class Env(object):
         return np.concatenate([obs, 
                                np.zeros_like(obs)+int(agent.is_ready)])  
     
-    def _get_obs(self, agent):
-        self.present_state(agent)
-        entity_pos = []
-        for robot in self.robot_list:
-            entity_pos.append(robot.target - agent.current_position)
-        other_pos = []
-        pre_actions = []
-        for other in self.robot_list:
-            pre_actions.append(other.action.pre_u_onehot)
-            if other is agent: continue
-            other_pos.append(other.current_position - agent.current_position)
-        obs = np.concatenate([agent.current_position] + \
-                               entity_pos + other_pos + \
-                               [np.concatenate(pre_actions)])
-        return np.concatenate([obs, 
-                               np.zeros_like(obs)+int(agent.is_ready)])    
+    # def _get_obs(self, agent):
+    #     self.present_state(agent)
+    #     entity_pos = []
+    #     for robot in self.robot_list:
+    #         entity_pos.append(robot.target - agent.current_position)
+    #     other_pos = []
+    #     pre_actions = []
+    #     for other in self.robot_list:
+    #         pre_actions.append(other.action.pre_u_onehot)
+    #         if other is agent: continue
+    #         other_pos.append(other.current_position - agent.current_position)
+    #     obs = np.concatenate([agent.current_position] + \
+    #                            entity_pos + other_pos + \
+    #                            [np.concatenate(pre_actions)])
+    #     return np.concatenate([obs, 
+    #                            np.zeros_like(obs)+int(agent.is_ready)])    
+    
+    def _get_action_now(self, action_choice):
+        action_one_hot = np.zeros(self.dim_p * 2 + 1)
+        # 不动
+        if action_choice == 4:
+            action_one_hot[0] = 1
+        # 往南走一格
+        elif action_choice == 1:
+            action_one_hot[1] = 1
+        # 往北走一格
+        elif action_choice == 0:
+            action_one_hot[2] = 1
+        # 往东走一格
+        elif action_choice == 3:
+            action_one_hot[3] = 1
+        # 往西走一格
+        elif action_choice == 2:
+            action_one_hot[4] = 1
+            
+        return action_one_hot
     
     def get_reward(self, robot):
         # 当e.is_end=False时，其他已到达目的地的agent的reward设为0
         if robot.is_end: return 0
         # 当agent移动中，鼓励其保持上一个动作（trick）
         if not robot.is_ready:
-            if np.all(robot.action.u_onehot == robot.action.pre_u_onehot): 
+            if np.all(robot.action.u_onehot == self._get_action_now(robot.action.action_choice)): 
                 # print('agent {} kept going'.format(robot.id))
                 return -1
             else:
-                # 还原为原本的动作
-                robot.action.u_onehot = robot.action.pre_u_onehot
                 # print('agent {} changed action'.format(robot.id))
                 return -10
         # 当agent.is_ready=True,正常调用interact，robot.action.action_choice为符合interact传入形式的值
         else:
             return self.interact(robot, robot.action.action_choice)
     
-    def _get_info(self, agent):
+    def get_info(self, agent):
         return agent.is_ready
 
-    def _get_done(self, agent):
+    def get_done(self, agent):
         return agent.is_end
