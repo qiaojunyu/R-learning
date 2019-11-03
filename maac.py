@@ -120,7 +120,7 @@ def run(config):
     # for check
     file_num = 1
     case_size = 1000
-    count_start = 60000
+    count_start = 30000
     result = []
     for ep_i in range(config.n_episodes):
         print("Episodes %i-%i of %i" % (ep_i + 1,
@@ -141,7 +141,7 @@ def run(config):
             for step_i in range(len(step_list)):
                 result_ep.append(step_list[step_i])
             result = []
-            with open('check_data_file/episode_result_6_6_4_32.csv','a',newline='')as f:
+            with open('check_data_file/episode_result_6_6_4_32_1.csv','a',newline='')as f:
                 f_csv = csv.writer(f)
                 f_csv.writerow(result_ep)
             f.close()
@@ -278,10 +278,15 @@ def run(config):
                 replay_buffer.push(e.obs, e.agent_actions, e.rewards, next_obs, dones)
         # for check
         if ep_i > count_start and not e.is_end:
-            if ep_i % case_size == 0:
-                file_num += 1
-            with open('check_data_file/unreach_case{}.txt'.format(file_num),'a') as file:
-                file.write('episode {} : \n{}'.format(ep_i+1, s))
+            false_num = 0
+            for  set_i in range(len(result)):
+                if result[set_i] == False:
+                   false_num = false_num+1
+            if false_num >1:
+                if ep_i % case_size == 0:
+                    file_num += 1
+                with open('check_data_file/unreach_case{}.txt'.format(file_num),'a') as file:
+                    file.write('episode {} : \n{}'.format(ep_i+1, s))
         # print(c)
         ep_dones = np.mean(success, axis=0)
         ep_steps = 1 - np.mean(steps / config.episode_length, axis=0)
