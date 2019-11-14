@@ -230,7 +230,7 @@ class Env(object):
         # self.seed(self.seed_int)
         # self.seed_int += 1
         
-        if (not agent.is_ready) and np.random.random() < 0.7:
+        if (not agent.is_ready) and np.random.random() < 1.1:
             agent.is_ready = True
             agent.current_position = agent.next_position
         state = [[-1 if c == '.' else 0 for c in line] for line in self.map]
@@ -501,8 +501,8 @@ class Env(object):
         obs = np.concatenate([agent.current_position] + \
                                entity_pos + other_pos + agent_pos + target_pos + \
                                 [np.concatenate(pre_actions)])
-        return np.concatenate([obs, 
-                               np.zeros_like(obs)+int(agent.is_ready)])  
+        return np.concatenate([obs,
+                               np.zeros(1)+int(agent.is_ready)])
     
     # def _get_obs(self, agent):
     #     self.present_state(agent)

@@ -37,38 +37,43 @@ def data_reprocess(replay_buffer_data, length):
 
 def run(config):
 
-  # config  data_ave = []
-  #   data_success = 0
-  #   data_false = 0
-  #   data_average = 0
-  #   with open('check_data_file/episode_result_6_6_4.csv')as c:
-  #
-  #       r = list(csv.reader(c))
-  #       index_size = len(r)
-  #       for i in r:
-  #           if float(i[0])>0:
-  #               data_ave.append(float(i[2]))
-  #               if float(i[2]) == 6:
-  #                   data_success = data_success+1
-  #               else:
-  #                   data_false = data_false +1
-  #               if float(i[0])%1000 == 0:
-  #                   data_average = np.mean(data_ave)
-  #                   a_res = [data_average,data_success,data_false]
-  #                   with open('check_data_file/analyse.csv','a',newline='')as file_a:
-  #                       file_a_csv = csv.writer(file_a)
-  #                       file_a_csv.writerow(a_res)
-  #                   date_ave = []
-  #                   data_success = 0
-  #                   data_false = 0
-  #                   data_average = 0
-  #               if float(i[0]) == index_size-1:
-  #                   data_average = np.mean(date_ave)
-  #                   a_res = [data_average,data_success,data_false]
-  #                   with open('check_data_file/analyse.csv','a',newline='')as file_a:
-  #                       file_a_csv = csv.writer(file_a)
-  #                       file_a_csv.writerow(a_res)
-  #   c.close()
+    # data_ave = []
+    # data_success = 0
+    # data_false = 0
+    # data_average = 0
+    # step_ave = 0
+    # with open('check_data_file/episode_result_6_6_4_32_7.csv')as c:
+    #
+    #     r = list(csv.reader(c))
+    #     index_size = len(r)
+    #     for i in r:
+    #         if float(i[0])>0:
+    #             data_ave.append(float(i[2]))
+    #             step_ave = step_ave+(float(i[3])+float(i[4])+float(i[5])+float(i[6])+float(i[7])+float(i[8]))
+    #             if float(i[2]) == 6:
+    #                 data_success = data_success+1
+    #             else:
+    #                 data_false = data_false +1
+    #             if float(i[0])%1000 == 0:
+    #                 data_average = np.mean(data_ave)
+    #                 step_ave = step_ave/(data_success+data_false)
+    #                 a_res = [data_average,data_success,data_false,step_ave]
+    #                 with open('check_data_file/analyse.csv','a',newline='')as file_a:
+    #                     file_a_csv = csv.writer(file_a)
+    #                     file_a_csv.writerow(a_res)
+    #                 date_ave = []
+    #                 data_success = 0
+    #                 data_false = 0
+    #                 data_average = 0
+    #                 step_ave = 0
+    #             if float(i[0]) == index_size-1:
+    #                 data_average = np.mean(data_ave)
+    #                 step_ave = step_ave/(data_success+data_false)
+    #                 a_res = [data_average,data_success,data_false,step_ave]
+    #                 with open('check_data_file/analyse.csv','a',newline='')as file_a:
+    #                     file_a_csv = csv.writer(file_a)
+    #                     file_a_csv.writerow(a_res)
+    # c.close()
 
     model_dir = Path('./models') / config.env_id / config.model_name
     if not model_dir.exists():
@@ -120,7 +125,7 @@ def run(config):
     # for check
     file_num = 1
     case_size = 1000
-    count_start = 30000
+    count_start = 20000
     result = []
     for ep_i in range(config.n_episodes):
         print("Episodes %i-%i of %i" % (ep_i + 1,
@@ -132,7 +137,7 @@ def run(config):
         false_number = 0
         true_number = 0
         if ep_i !=0:
-            for  set_i in range(len(result)):
+            for set_i in range(len(result)):
                 if result[set_i] == False:
                     false_number = false_number+1
                 else:
@@ -141,13 +146,10 @@ def run(config):
             for step_i in range(len(step_list)):
                 result_ep.append(step_list[step_i])
             result = []
-            with open('check_data_file/episode_result_6_6_4_32_1.csv','a',newline='')as f:
+            with open('check_data_file/episode_result_6_6_6_128.csv','a',newline='')as f:
                 f_csv = csv.writer(f)
                 f_csv.writerow(result_ep)
             f.close()
-            with open('check_data_file/episode_result{}.txt'.format(1),'a') as file:
-                file.write('episode {} : \n{}\n'.format(ep_i-1, result_ep))
-            file.close()
         e.create_map()
         model.prep_rollouts(device='cpu')
         step_list = np.zeros(agent_num)
@@ -168,6 +170,7 @@ def run(config):
             for robot in e.robot_list:
                 # 未到达目的地
                 if robot.is_end is False:
+                    # 执行动作，更新agent的位置，目前位置是1，目标位置是2，其他agent是-2
                     ready, current_state = e.present_state(robot)
                 robot.state = e.get_obs(robot)
                 dones.append(robot.is_end)
@@ -196,12 +199,12 @@ def run(config):
             # torch.manual_seed(tseed)
             # tseed += 1
             # get actions as torch Variables
+            #  生成动作
             torch_agent_actions = model.step(torch_obs, explore=True)
             # convert actions to numpy arrays
             agent_actions = [ac.data.numpy() for ac in torch_agent_actions]
             e.agent_actions = agent_actions
             actions = [[ac[i] for ac in agent_actions] for i in range(config.n_rollout_threads)]
-            
             reach_now = np.zeros(agent_num, dtype=np.bool)
             for robot in e.robot_list:
                 # 已经到达目的地
@@ -209,6 +212,7 @@ def run(config):
                     robot.reward = 0
                     continue
                 # set action for agent
+                # 给每个agent设定动作
                 e.set_action(robot, actions[0][robot.id])
                 if robot.is_ready:
                     step_list[robot.id] += 1
@@ -262,6 +266,7 @@ def run(config):
                 model.update_all_targets()
                 model.prep_rollouts(device='cpu')
         # exit(0)
+
         dones = tuple([[robot.is_end for robot in e.robot_list]])
         result = np.stack(dones)[0]
         if not e.is_end:
@@ -278,15 +283,15 @@ def run(config):
                 replay_buffer.push(e.obs, e.agent_actions, e.rewards, next_obs, dones)
         # for check
         if ep_i > count_start and not e.is_end:
-            false_num = 0
-            for  set_i in range(len(result)):
+             false_number = 0
+             for set_i in range(len(result)):
                 if result[set_i] == False:
-                   false_num = false_num+1
-            if false_num >1:
-                if ep_i % case_size == 0:
-                    file_num += 1
-                with open('check_data_file/unreach_case{}.txt'.format(file_num),'a') as file:
-                    file.write('episode {} : \n{}'.format(ep_i+1, s))
+                    false_number = false_number+1
+             if ep_i % case_size == 0:
+                file_num += 1
+                if false_number >1:
+                    with open('check_data_file/unreach_case{}.txt'.format(file_num),'a') as file:
+                        file.write('episode {} : \n{}'.format(ep_i+1, s))
         # print(c)
         ep_dones = np.mean(success, axis=0)
         ep_steps = 1 - np.mean(steps / config.episode_length, axis=0)
@@ -351,9 +356,9 @@ if __name__ == '__main__':
                              "model/training contents")
     parser.add_argument("--n_rollout_threads", default=1, type=int)
     parser.add_argument("--buffer_length", default=int(1e6), type=int)
-    parser.add_argument("--n_episodes", default=300000, type=int)
+    parser.add_argument("--n_episodes", default=200000, type=int)
     parser.add_argument("--episode_length", default=50, type=int)
-    parser.add_argument("--steps_per_update", default=100, type=int)
+    parser.add_argument("--steps_per_update", default=40, type=int)
     parser.add_argument("--num_critic_updates", default=6, type=int,
                         help="Number of critic updates per update cycle")
     parser.add_argument("--num_pol_updates", default=6, type=int,
@@ -365,13 +370,16 @@ if __name__ == '__main__':
                         default=1024, type=int,
                         help="Batch size for critic training")
     parser.add_argument("--save_interval", default=1000, type=int)
-    parser.add_argument("--pol_hidden_dim", default=128, type=int)
-    parser.add_argument("--critic_hidden_dim", default=96, type=int)
+    parser.add_argument("--pol_hidden_dim", default=80, type=int)
+    parser.add_argument("--critic_hidden_dim", default=48, type=int)
     parser.add_argument("--attend_heads", default=6, type=int)
+    # pi_lr (float): Learning rate for policy
+    # q_lr (float): Learning rate for critic
     parser.add_argument("--pi_lr", default=0.001, type=float)
     parser.add_argument("--q_lr", default=0.001, type=float)
     parser.add_argument("--tau", default=0.04, type=float)
     parser.add_argument("--gamma", default=0.99, type=float)
+    ##sac,100,探索越大
     parser.add_argument("--reward_scale", default=100., type=float)
     parser.add_argument("--use_gpu", action='store_true')
 
