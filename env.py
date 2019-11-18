@@ -502,7 +502,7 @@ class Env(object):
                                entity_pos + other_pos + agent_pos + target_pos + \
                                 [np.concatenate(pre_actions)])
         return np.concatenate([obs,
-                               np.zeros(1)+int(agent.is_ready)])
+                               np.zeros(1)+int(agent.is_ready)+3])
     
     # def _get_obs(self, agent):
     #     self.present_state(agent)
@@ -548,7 +548,7 @@ class Env(object):
         if not robot.is_ready:
             if np.all(robot.action.u_onehot == self._get_action_now(robot.action.action_choice)): 
                 # print('agent {} kept going'.format(robot.id))
-                return -1
+                return -3
             else:
                 # print('agent {} changed action'.format(robot.id))
                 return -10

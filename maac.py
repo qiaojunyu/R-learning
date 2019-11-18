@@ -289,9 +289,9 @@ def run(config):
                     false_number = false_number+1
              if ep_i % case_size == 0:
                 file_num += 1
-                if false_number >1:
-                    with open('check_data_file/unreach_case{}.txt'.format(file_num),'a') as file:
-                        file.write('episode {} : \n{}'.format(ep_i+1, s))
+             if false_number >1:
+                with open('check_data_file/unreach_case{}.txt'.format(file_num),'a') as file:
+                    file.write('episode {} : \n{}'.format(ep_i+1, s))
         # print(c)
         ep_dones = np.mean(success, axis=0)
         ep_steps = 1 - np.mean(steps / config.episode_length, axis=0)
@@ -359,9 +359,9 @@ if __name__ == '__main__':
     parser.add_argument("--n_episodes", default=200000, type=int)
     parser.add_argument("--episode_length", default=50, type=int)
     parser.add_argument("--steps_per_update", default=40, type=int)
-    parser.add_argument("--num_critic_updates", default=6, type=int,
+    parser.add_argument("--num_critic_updates", default=2, type=int,
                         help="Number of critic updates per update cycle")
-    parser.add_argument("--num_pol_updates", default=6, type=int,
+    parser.add_argument("--num_pol_updates", default=2, type=int,
                         help="Number of policy updates per update cycle")
     parser.add_argument("--pi_batch_size",
                         default=1024, type=int,
@@ -371,7 +371,7 @@ if __name__ == '__main__':
                         help="Batch size for critic training")
     parser.add_argument("--save_interval", default=1000, type=int)
     parser.add_argument("--pol_hidden_dim", default=80, type=int)
-    parser.add_argument("--critic_hidden_dim", default=48, type=int)
+    parser.add_argument("--critic_hidden_dim", default=192, type=int)
     parser.add_argument("--attend_heads", default=6, type=int)
     # pi_lr (float): Learning rate for policy
     # q_lr (float): Learning rate for critic
