@@ -230,7 +230,7 @@ class Env(object):
         # self.seed(self.seed_int)
         # self.seed_int += 1
         
-        if (not agent.is_ready) and np.random.random() < 1.1:
+        if (not agent.is_ready) and np.random.random() < 0.5:
             agent.is_ready = True
             agent.current_position = agent.next_position
         state = [[-1 if c == '.' else 0 for c in line] for line in self.map]
@@ -445,6 +445,9 @@ class Env(object):
             # cannot change the calling order of 
             # functions get_reward and get_obs
             reward_n.append(self.get_reward(agent))
+
+
+
         
         for agent in self.robot_list:
             obs_n.append(self.get_obs(agent))
@@ -543,7 +546,8 @@ class Env(object):
     
     def get_reward(self, robot):
         # 当e.is_end=False时，其他已到达目的地的agent的reward设为0
-        if robot.is_end: return 0
+        if robot.is_end:
+            return 0
         # 当agent移动中，鼓励其保持上一个动作（trick）
         if not robot.is_ready:
             if np.all(robot.action.u_onehot == self._get_action_now(robot.action.action_choice)): 

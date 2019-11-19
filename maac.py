@@ -206,10 +206,14 @@ def run(config):
             e.agent_actions = agent_actions
             actions = [[ac[i] for ac in agent_actions] for i in range(config.n_rollout_threads)]
             reach_now = np.zeros(agent_num, dtype=np.bool)
+
+
+            reward_agents = []
             for robot in e.robot_list:
                 # 已经到达目的地
                 if robot.is_end:
                     robot.reward = 0
+                    reward_agents.append(robot.reward)
                     continue
                 # set action for agent
                 # 给每个agent设定动作
@@ -218,9 +222,16 @@ def run(config):
                     step_list[robot.id] += 1
                 # get reward
                 robot.reward = e.get_reward(robot)
+                reward_agents.append(robot.reward)
                 total_reward_list[robot.id] += robot.reward
+
+            if 1000 in reward_agents:
+                rew_i = 0
+                for robot in e.robot_list:
+                    if(robot.reward != 1000):
+                       robot.reward = reward_agents[rew_i]+100
                 # for check
-                is_print = True
+            is_print = True
             #     # 刚刚到达目的地
             #     if robot.is_end:
             #         reach_now[robot.id] = True
