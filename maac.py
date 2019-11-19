@@ -225,11 +225,11 @@ def run(config):
                 reward_agents.append(robot.reward)
                 total_reward_list[robot.id] += robot.reward
 
-            # if 1000 in reward_agents:
-            #     rew_i = 0
-            #     for robot in e.robot_list:
-            #         if(robot.reward != 1000 & robot.is_end != True):
-            #            robot.reward = reward_agents[rew_i]+100
+            if 1000 in reward_agents:
+                rew_i = 0
+                for robot in e.robot_list:
+                    if(robot.reward != 1000 & robot.is_end != True):
+                       robot.reward = reward_agents[rew_i]+100
             #     # for check
             is_print = True
             #     # 刚刚到达目的地
